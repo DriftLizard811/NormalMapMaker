@@ -4,13 +4,8 @@
 #include <string>
 
 #include "Color.h"
-
-const std::string REQUIRED_FORMAT = "P3";
-
-float lerp(float a, float b, float t)
-{
-    return a + ((b-a) * t);
-}
+#include "Image.h"
+#include "MathLib.h"
 
 int main()
 {    
@@ -50,29 +45,17 @@ int main()
                 fin >> pixelFormat;
                 std::cout << std::endl << "Pixel Format: " << pixelFormat << std::endl;
 
-                //create a 2D array to store the input colors
-                Color** inputArray = new Color*[width];
-                Color** outputArray = new Color*[width];
-                for (int i = 0; i < width; i++)
-                {
-                    inputArray[i] = new Color[height];
-                    outputArray[i] = new Color[height];
-                }
+                //create input and output images
+                Image inputImage = Image(width, height, pixelFormat);
+                Image outputImage = Image(width, height, pixelFormat);
 
-                //populate the input array
-                for (int i = 0; i < height; i++)
-                {
-                    for (int j = 0; j < width; j++)
-                    {
-                        fin >> inputArray[j][i].R;
-                        fin >> inputArray[j][i].G;
-                        fin >> inputArray[j][i].B;                        
-                    }
-                }
+                //populate the input array pixel by pixel
+                inputImage.readFromFile(fin);
 
                 //evaluate pixels
                 float above, below, averageVertical;
                 float left, right, averageHorizontal;
+                int r, g, b;
                 for (int i = 0; i < height; i++)
                 {
                     for (int j = 0; j < width; j++)
@@ -80,78 +63,57 @@ int main()
                         //evalutate left-right curves
                         if (j == width - 1)
                         {
-                            left = (float)(inputArray[j - 1][i].R - inputArray[j][i].R + pixelFormat) / (float)(2 * pixelFormat);
-                            right = (float)(inputArray[j][i].R - inputArray[0][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            left = (float)(inputImage.getPixelValue(j - 1, i).getR() - inputImage.getPixelValue(j, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            right = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(0, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageHorizontal = (left + right) / 2.0f;
                         }
                         else if (j == 0)
                         {
-                            left = (float)(inputArray[width - 1][i].R - inputArray[j + 1][i].R + pixelFormat) / (float)(2 * pixelFormat);
-                            right = (float)(inputArray[j][i].R - inputArray[j + 1][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            left = (float)(inputImage.getPixelValue(width - 1, i).getR() - inputImage.getPixelValue(j + 1, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            right = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(j + 1, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageHorizontal = (left + right) / 2.0f;
                         }
                         else
                         {
-                            left = averageHorizontal = (float)(inputArray[j - 1][i].R - inputArray[j][i].R + pixelFormat) / (float)(2 * pixelFormat);
-                            right = averageHorizontal = (float)(inputArray[j][i].R - inputArray[j + 1][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            left = averageHorizontal = (float)(inputImage.getPixelValue(j - 1, i).getR() - inputImage.getPixelValue(j, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            right = averageHorizontal = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(j + 1, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageHorizontal = (left + right) / 2.0f;
                         }
 
                         //evaluate up-down curves
                         if (i == height - 1)
                         {
-                            above = (float)(inputArray[j][i].R - inputArray[j][i - 1].R + pixelFormat) / (float)(2 * pixelFormat);
-                            below = (float)(inputArray[j][0].R - inputArray[j][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            above = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(j, i - 1).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            below = (float)(inputImage.getPixelValue(j, 0).getR() - inputImage.getPixelValue(j, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageVertical = (above + below) / 2.0f;
                         }
                         else if (i == 0)
                         {
-                            above = (float)(inputArray[j][i].R - inputArray[j][height - 1].R + pixelFormat) / (float)(2 * pixelFormat);
-                            below = (float)(inputArray[j][i + 1].R - inputArray[j][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            above = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(j, height - 1).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            below = (float)(inputImage.getPixelValue(j, i + 1).getR() - inputImage.getPixelValue(j, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageVertical = (above + below) / 2.0f;
                         }
                         else
                         {
-                            above = (float)(inputArray[j][i].R - inputArray[j][i - 1].R + pixelFormat) / (float)(2 * pixelFormat);
-                            below = (float)(inputArray[j][i + 1].R - inputArray[j][i].R + pixelFormat) / (float)(2 * pixelFormat);
+                            above = (float)(inputImage.getPixelValue(j, i).getR() - inputImage.getPixelValue(j, i - 1).getR() + pixelFormat) / (float)(2 * pixelFormat);
+                            below = (float)(inputImage.getPixelValue(j, i + 1).getR() - inputImage.getPixelValue(j, i).getR() + pixelFormat) / (float)(2 * pixelFormat);
                             averageVertical = (above + below) / 2.0f;
                         }
 
-                        outputArray[j][i].R = averageHorizontal * pixelFormat;
-                        outputArray[j][i].G = averageVertical * pixelFormat;
+                        r = averageHorizontal * pixelFormat;
+                        g = averageVertical * pixelFormat;
                         float horizontalDiff = std::abs(0.5f - averageHorizontal);
                         float verticalDiff = std::abs(0.5f - averageVertical);
                         float diffFactor = 1.0f - ((horizontalDiff + verticalDiff));
-                        outputArray[j][i].B = diffFactor * pixelFormat;
+                        b = diffFactor * pixelFormat;
+                        outputImage.setPixelValue(Color(r, g, b), j, i);
                     }
                 }
 
                 //output the resulting image
-                //setup header
-                fout.open("output.ppm");
-                fout << REQUIRED_FORMAT << std::endl
-                    << width << " " << height << std::endl
-                    << pixelFormat << std::endl;
-
-                //output each pixel
-                for (int i = 0; i < height; i++)
-                {
-                    for (int j = 0; j < width; j++)
-                    {
-                        outputArray[j][i].Output(fout);
-                    }
-                }
-
+                fout.open("output.ppm");                
+                outputImage.writeToFile(fout);
                 fout.close();
-
-                //cleanup memory
-                for (int i = 0; i < width; i++)
-                {
-                    delete inputArray[i];
-                    delete outputArray[i];
-                }
-                delete[] inputArray;
-                delete[] outputArray;
             }            
         }
 

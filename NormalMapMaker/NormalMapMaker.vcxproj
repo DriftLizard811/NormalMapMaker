@@ -126,10 +126,12 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MathLib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="MathLib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

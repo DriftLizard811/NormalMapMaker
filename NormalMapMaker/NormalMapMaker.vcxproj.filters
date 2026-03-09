@@ -24,12 +24,18 @@
     <ClCompile Include="Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MathLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

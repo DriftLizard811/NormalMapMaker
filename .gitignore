@@ -1,0 +1,8 @@
+**/.vs
+**/Debug
+
+*.ppm
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
