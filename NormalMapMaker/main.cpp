@@ -5,6 +5,7 @@
 
 #include "Color.h"
 #include "Image.h"
+#include "TextureSet.h"
 #include "MathLib.h"
 
 int main()
@@ -111,7 +112,7 @@ int main()
                 }
 
                 //output the resulting image
-                fout.open("output.ppm");                
+                fout.open("output\\output.ppm");                
                 outputImage.writeToFile(fout);
                 fout.close();
             }            
